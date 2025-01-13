@@ -12,16 +12,10 @@ ARG APP_HOME=/app
 
 WORKDIR ${APP_HOME}
 
-RUN addgroup -S invoice && adduser -S -G invoice invoice
-
 COPY package*.json ./
 
 RUN npm install
 
-COPY --chown=invoice:invoice . ${APP_HOME}
-
-RUN chown -R invoice:invoice ${APP_HOME}
-
-USER invoice
+COPY . ${APP_HOME}
 
 CMD ["npm", "run", "dev"]

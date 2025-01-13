@@ -20,7 +20,7 @@ show-logs-client:
 	docker compose -f local.yml logs client
 
 user:
-	docker run --rm billify-app-api whoami
+	docker run --rm billify-api whoami
 
 volume:
-	docker volume inspect billify-app_mongodb-data
+	docker volume inspect billify_mongodb-data
