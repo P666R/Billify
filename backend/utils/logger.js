@@ -16,7 +16,7 @@ export const systemLogs = createLogger({
   level: 'http',
   format: combine(
     timestamp({ format: 'YYYY-MM-DD hh:mm:ss.SSS A' }),
-    prettyPrint(),
+    prettyPrint()
   ),
   transports: [
     fileRotateTransport,
@@ -36,9 +36,9 @@ if (process.env.NODE_ENV === 'development') {
     new transports.Console({
       format: format.combine(
         format.timestamp({ format: 'YYYY-MM-DD hh:mm:ss.SSS A' }),
-        format.prettyPrint(),
+        format.prettyPrint()
       ),
-    }),
+    })
   );
 }
 
@@ -61,5 +61,5 @@ export const morganMiddleware = morgan(
         systemLogs.http(`incoming-request`, data);
       },
     },
-  },
+  }
 );
