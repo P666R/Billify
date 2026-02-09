@@ -1,0 +1,38 @@
+# Dependencies
+**/node_modules/
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+
+# Build outputs
+**/dist/
+**/build/
+**/.vite/
+**/.next/
+**/.nuxt/
+
+# Logs
+logs/
+**/*.log
+
+# Husky
+.husky/
+
+# Docker
+docker/
+**/Dockerfile
+**/.dockerignore
+
+# Git
+.git/
+.gitignore
+
+# Config files (don't format these)
+.prettierrc
+.prettierignore
+.eslintrc*
+**/.env*
+
+# Generated files
+coverage/
+**/.cache/
