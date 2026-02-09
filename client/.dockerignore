@@ -1,0 +1,58 @@
+# === DEPENDENCIES ===
+node_modules
+.npm
+.pnp.*
+
+# === BUILD ARTIFACTS ===
+dist
+dist-ssr
+build
+.vite
+.cache
+
+# === DEVELOPMENT FILES ===
+*.md
+README.md
+.vscode/
+.idea/
+
+# === SOURCE CONTROL ===
+.git
+.gitignore
+.gitattributes
+
+# === LOGS ===
+*.log
+npm-debug.log*
+
+# === ENVIRONMENT (Keep .env.example if needed) ===
+.env
+.env.local
+.env.*.local
+.env.development
+!.env.example
+
+# === DOCKER FILES ===
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+docker/
+
+# === TESTING ===
+__tests__/
+*.test.js
+*.test.jsx
+*.spec.js
+*.spec.jsx
+coverage/
+
+# === LINTING & FORMATTING ===
+.eslintrc*
+eslint.config.js
+.prettierrc*
+.prettierignore
+
+# === MISC ===
+.DS_Store
+Thumbs.db
+*.tgz
