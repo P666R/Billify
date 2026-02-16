@@ -1,10 +1,10 @@
-import 'dotenv/config';
 import nodemailer from 'nodemailer';
 import mg from 'nodemailer-mailgun-transport';
-import { systemLogs } from '../utils/logger.js';
+import { createChild } from '#utils/logger.js';
+import { envConfig } from '#config/env-config.js';
 
-const logger = systemLogs.child({ service: 'email-transport' });
-const isProd = process.env.NODE_ENV === 'production';
+const logger = createChild({ service: 'email-transport' });
+const { isProd } = envConfig;
 
 let transporter = null;
 
@@ -25,8 +25,7 @@ const getTransporter = () => {
 
 const connectEmailTransport = async () => {
   try {
-    const activeTransporter = getTransporter();
-    await activeTransporter().verify();
+    await getTransporter().verify();
     const connectionMsg = `email-transport: connected to ${isProd ? 'mailgun' : 'mailhog'}`;
     logger.info(connectionMsg);
   } catch (error) {
