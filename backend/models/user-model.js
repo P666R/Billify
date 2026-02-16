@@ -1,19 +1,8 @@
-/**
- * @file User Model Configuration
- * @description Handles user schema, password hashing, and role-based access control.
- * @module models/User
- */
-
 import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
-import { USER, ADMIN } from '../constants.js';
+import { USER, ADMIN } from '#constants/index.js';
 
-/**
- * Mongoose schema for User accounts.
- *
- * Includes built-in validation for emails, usernames, and passwords.
- */
 const userSchema = new mongoose.Schema(
   {
     email: {
@@ -61,6 +50,20 @@ const userSchema = new mongoose.Schema(
         'Password must be 8+ chars with upper, lower, number, and symbol',
       ],
     },
+    passwordConfirm: {
+      type: String,
+      select: false,
+      // Required only for local email strategy
+      required: function () {
+        return this.provider === 'email';
+      },
+      validate: {
+        validator: function (v) {
+          return v === this.password;
+        },
+        message: 'Passwords do not match',
+      },
+    },
     isEmailVerified: {
       type: Boolean,
       required: true,
@@ -85,7 +88,7 @@ const userSchema = new mongoose.Schema(
         validator.isMobilePhone,
         "Please provide a valid phone number, begin with '+', then country code and number",
       ],
-      default: '+911234567890',
+      default: '+919876543210',
     },
     address: { type: String, trim: true },
     city: { type: String, trim: true },
@@ -107,33 +110,8 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-/**
- * Virtual field for password confirmation.
- *
- * Used for validation but never persisted to MongoDB.
- */
-userSchema
-  .virtual('passwordConfirm')
-  .set(function (v) {
-    this._passwordConfirm = v;
-  })
-  .get(function () {
-    return this._passwordConfirm;
-  });
-
-/**
- * Middleware: Password Security
- *
- * 1. Validates password confirmation.
- * 2. Hashes password using Bcrypt.
- * 3. Updates passwordChangedAt timestamp.
- */
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-
-  if (this.password !== this._passwordConfirm) {
-    return next(new Error('Passwords do not match'));
-  }
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -141,17 +119,9 @@ userSchema.pre('save', async function (next) {
   // Set timestamp 1s in past to prevent JWT race conditions
   if (!this.isNew) this.passwordChangedAt = Date.now() - 1000;
 
-  // Memory cleanup
-  this._passwordConfirm = undefined;
-  next();
+  this.passwordConfirm = undefined;
 });
 
-/**
- * Instance Method: Verify Password
- *
- * @param {string} givenPassword - Plain text password from request
- * @returns {Promise<boolean>} Match status
- */
 userSchema.methods.comparePassword = async function (givenPassword) {
   return await bcrypt.compare(givenPassword, this.password);
 };
