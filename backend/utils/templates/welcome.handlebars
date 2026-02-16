@@ -1,0 +1,93 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <title>Welcome to Billify</title>
+
+    <style>
+      @media (max-width: 600px) {
+        main {
+          padding: 20px !important;
+        }
+        section {
+          padding: 24px !important;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #000 !important;
+          color: #fff !important;
+        }
+        article {
+          background: #000 !important;
+          border: 1px solid #262626 !important;
+        }
+        header,
+        footer {
+          background: #fff !important;
+          color: #000 !important;
+        }
+        .cta {
+          background: #fff !important;
+          color: #000 !important;
+        }
+      }
+    </style>
+
+  </head>
+
+  <body
+    style="margin:0;background:#fff;color:#000;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;"
+  >
+    <main style='display:flex;justify-content:center;padding:32px 12px'>
+      <article
+        style='max-width:600px;width:100%;border:1px solid #e5e5e5;border-radius:12px'
+      >
+
+        <header
+          style='padding:24px 32px;background:#000;color:#fff;border-bottom:1px solid #e5e5e5'
+        >
+          <strong style='font-size:18px'>Billify</strong>
+        </header>
+
+        <section style='padding:32px'>
+          <h1 style='margin:0 0 12px;font-size:22px;font-weight:600'>Welcome,
+            {{name}}</h1>
+
+          <p style='margin:0 0 16px;font-size:15px;line-height:1.6'>
+            Your account has been verified successfully.
+          </p>
+
+          <p style='margin:0 0 22px;font-size:15px;line-height:1.6'>
+            Click below to login to your account.
+          </p>
+
+          <p style='margin:0 0 26px'>
+            <a
+              href='{{link}}'
+              class='cta'
+              style='display:inline-block;padding:12px 20px;background:#000;color:#fff;font-size:14px;font-weight:600;text-decoration:none;border-radius:8px'
+            >
+              Login
+            </a>
+          </p>
+
+          <aside style='font-size:14px;margin:0 0 20px'>
+            Your data is encrypted and secure.
+          </aside>
+
+          <p style='margin:0;font-size:14px'>Need help? Our support team is here
+            for you.</p>
+        </section>
+
+        <footer
+          style='padding:16px 32px;background:#000;color:#fff;font-size:12px'
+        >
+          © 2026 Billify. All rights reserved.
+        </footer>
+      </article>
+    </main>
+
+  </body>
+</html>
