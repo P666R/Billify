@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
-import { systemLogs } from '../utils/logger.js';
+import { createChild } from '../utils/logger.js';
 
 export const connectionToDB = async () => {
-  const logger = systemLogs.child({ service: 'database' });
+  const logger = createChild({ service: 'database' });
   try {
     const connectionParams = {
       dbName: process.env.DB_NAME,
