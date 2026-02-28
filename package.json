@@ -73,12 +73,10 @@
   "author": "P666R",
   "license": "ISC",
   "dependencies": {
-    "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.4",
     "envalid": "^8.1.1",
     "express": "^5.2.1",
-    "express-async-handler": "^1.2.0",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.2.1",
     "handlebars": "^4.7.8",
