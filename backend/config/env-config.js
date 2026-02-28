@@ -19,6 +19,7 @@ export const envConfig = cleanEnv(process.env, {
   MONGO_URI: str({ default: '' }),
 
   // Security (will throw if missing)
+  DUMMY_HASHED_PASSWORD: str(),
   JWT_ACCESS_SECRET_KEY: str(),
   JWT_REFRESH_SECRET_KEY: str(),
 
