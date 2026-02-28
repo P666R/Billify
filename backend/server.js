@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import http from 'node:http';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import {
@@ -22,6 +23,8 @@ await connectionToDB();
 // Initialize express app
 const app = express();
 
+const server = http.createServer(app);
+
 // Trust proxy sent by nginx
 // 1 represents the single hop from Nginx container to API container
 app.set('trust proxy', 1);
@@ -43,7 +46,27 @@ app.use('/api/v1/auth', authRouter);
 app.use(notFoundHandlerMiddleware);
 app.use(errorHandlerMiddleware);
 
+process.on('uncaughtException', (err) => {
+  logger.fatal({ err }, 'Uncaught exception - shutting down');
+  logger.flush?.(() => process.exit(1));
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error(
+    {
+      err: reason instanceof Error ? reason : new Error(JSON.stringify(reason)),
+      promise,
+    },
+    'Unhandled promise rejection'
+  );
+});
+
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received - graceful shutdown');
+  server.close(() => process.exit(0));
+});
+
 // Start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   logger.info(`server: running in ${NODE_ENV} mode on port ${PORT}`);
 });
