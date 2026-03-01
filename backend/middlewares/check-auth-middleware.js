@@ -19,7 +19,7 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
     const decoded = jwt.verify(jwtToken, envConfig.JWT_ACCESS_SECRET_KEY);
 
     const user = await userRepository
-      .findUserbyId(decoded.id)
+      .findUserById(decoded.id)
       .select('-password');
 
     if (!user) {
