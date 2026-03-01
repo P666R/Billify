@@ -1,7 +1,7 @@
-import bcrypt from 'bcryptjs';
 import mongoose from 'mongoose';
 import validator from 'validator';
 import { USER, ADMIN } from '#constants/index.js';
+import { hashPassword, verifyPassword } from '#utils/password.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -107,14 +107,14 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    validateModifiedOnly: true,
   }
 );
 
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  this.password = await hashPassword(this.password);
 
   // Set timestamp 1s in past to prevent JWT race conditions
   if (!this.isNew) this.passwordChangedAt = Date.now() - 1000;
@@ -123,7 +123,7 @@ userSchema.pre('save', async function () {
 });
 
 userSchema.methods.comparePassword = async function (givenPassword) {
-  return await bcrypt.compare(givenPassword, this.password);
+  return await verifyPassword(givenPassword, this.password);
 };
 
 export const User = mongoose.model('User', userSchema);
