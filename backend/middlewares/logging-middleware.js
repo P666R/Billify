@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 import {
   createChild,
   errorSerializerDev,
@@ -7,11 +7,12 @@ import {
 import { pinoHttp } from 'pino-http';
 import { AppError } from '#utils/app-error.js';
 import { envConfig } from '#config/env-config.js';
+import { loggerStore } from '#helpers/context-provider.js';
 
 const { isProd } = envConfig;
 
 export const httpLoggingMiddleware = () => {
-  return pinoHttp({
+  const pino = pinoHttp({
     autoLogging: {
       ignore: (req) => {
         const ignoredPaths = ['/health', '/metrics', '/favicon.ico'];
@@ -25,10 +26,18 @@ export const httpLoggingMiddleware = () => {
       responseTime: 'durationMs',
     },
 
-    customErrorMessage: (req, res, err) => {
+    customReceivedMessage: () => {
+      return '→ Incoming Request';
+    },
+
+    customSuccessMessage: () => {
+      return '← Request Completed';
+    },
+
+    customErrorMessage: (_req, _res, err) => {
       const errorCode =
         err instanceof AppError ? err.errorCode : 'UNKNOWN_ERROR';
-      return `✗ ${req.method} ${req.url} ${res.statusCode} [${errorCode}] ${err.message}`;
+      return `✗ Request Failed [${errorCode}]`;
     },
 
     customLogLevel: (_req, res, err) => {
@@ -37,18 +46,11 @@ export const httpLoggingMiddleware = () => {
       return 'info';
     },
 
+    // Ensure trace IDs are explicitly included in the log object
     customProps: (req) => ({
-      correlationId: req.correlationId,
       requestId: req.id,
+      correlationId: req.correlationId,
     }),
-
-    customReceivedMessage: (req) => {
-      return `→ ${req.method} ${req.url}`;
-    },
-
-    customSuccessMessage: (req, res) => {
-      return `← ${req.method} ${req.url} ${res.statusCode}`;
-    },
 
     genReqId: (req, res) => {
       const requestIdHeader = req.headers['x-request-id'];
@@ -57,12 +59,12 @@ export const httpLoggingMiddleware = () => {
       const requestId =
         (Array.isArray(requestIdHeader)
           ? requestIdHeader[0]
-          : requestIdHeader) ?? uuidv4();
+          : requestIdHeader) ?? randomUUID();
 
       const correlationId =
         (Array.isArray(correlationIdHeader)
           ? correlationIdHeader[0]
-          : correlationIdHeader) ?? uuidv4();
+          : correlationIdHeader) ?? randomUUID();
 
       req.id = requestId;
       req.correlationId = correlationId;
@@ -73,6 +75,7 @@ export const httpLoggingMiddleware = () => {
       return requestId;
     },
 
+    // Uses the service-aware Proxy logger for HTTP access logs
     logger: createChild({
       service: 'http',
     }),
@@ -93,10 +96,29 @@ export const httpLoggingMiddleware = () => {
 
     wrapSerializers: false,
   });
+
+  return (req, res, next) => {
+    // Manually trigger pino-http to ensure req.log and IDs are initialized
+    pino(req, res);
+
+    // Provide req.log to the store so createChild() proxies can access it
+    loggerStore.run(req.log, () => next());
+  };
 };
 
+/**
+ * Updates the current request's logger with new context (e.g., userId).
+ * Uses enterWith to ensure the AsyncLocalStorage is updated for the rest of the request.
+ */
 export const enrichRequestLogger = (req, context) => {
-  req.log = req.log.child(context);
+  if (req.log) {
+    const enrichedLogger = req.log.child(context);
+
+    req.log = enrichedLogger;
+
+    // Update store mid-flight so all proxied loggers pick up new context
+    loggerStore.enterWith(enrichedLogger);
+  }
 };
 
 export const getRequestLogger = (req) => req.log;
