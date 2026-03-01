@@ -7,14 +7,14 @@ const emailSchema = z
   .min(1, 'Email is required')
   .trim()
   .toLowerCase()
-  .refine(validator.isEmail, { error: 'Invalid email address' });
+  .refine((v) => validator.isEmail(v), { error: 'Invalid email address' });
 
 const usernameSchema = z
   .string()
   .min(1, 'Username is required')
   .trim()
   .toLowerCase()
-  .refine(/^[a-z][a-z0-9-_]{3,23}$/i, {
+  .regex(/^[a-z][a-z0-9-_]{3,23}$/, {
     error:
       'Username must start with a letter and contain only letters, numbers, hyphens, or underscores',
   });
@@ -23,21 +23,37 @@ const firstNameSchema = z
   .string()
   .min(1, 'First name is required')
   .trim()
-  .refine(validator.isAlpha, { error: 'First name must contain only letters' });
+  .refine((v) => validator.isAlpha(v), {
+    error: 'First name must contain only letters',
+  });
 
 const lastNameSchema = z
   .string()
   .min(1, 'Last name is required')
   .trim()
-  .refine(validator.isAlpha, { error: 'Last name must contain only letters' });
+  .refine((v) => validator.isAlpha(v), {
+    error: 'Last name must contain only letters',
+  });
 
 const passwordSchema = z
   .string()
   .min(1, 'Password is required')
   .trim()
-  .refine(validator.isStrongPassword, {
+  .refine((v) => validator.isStrongPassword(v), {
     error: 'Password must be 8+ chars with upper, lower, number, and symbol',
   });
+
+const emailTokenSchema = z.hash('sha256', {
+  enc: 'hex',
+  error: 'Invalid email token',
+});
+
+const userIdSchema = z
+  .string()
+  .length(24, 'Invalid user ID')
+  .refine((v) => validator.isMongoId(v), { error: 'Invalid user ID' });
+
+const jwtSchema = z.jwt({ alg: 'HS256' });
 
 // Schemas
 export const registerUserSchema = z
@@ -52,4 +68,50 @@ export const registerUserSchema = z
   .refine((v) => v.password === v.passwordConfirm, {
     message: 'Passwords do not match',
     path: ['passwordConfirm'],
-  });
+  })
+  .readonly();
+
+export const verifyEmailSchema = z
+  .strictObject({
+    emailToken: emailTokenSchema,
+    userId: userIdSchema,
+  })
+  .readonly();
+
+export const loginUserSchema = z
+  .strictObject({
+    email: emailSchema,
+    password: passwordSchema,
+  })
+  .readonly();
+
+export const refreshTokenSchema = z
+  .strictObject({
+    jwt: jwtSchema,
+  })
+  .readonly();
+
+export const resendVerifyEmailSchema = z
+  .strictObject({
+    email: emailSchema,
+  })
+  .readonly();
+
+export const passwordResetRequestSchema = z
+  .strictObject({
+    email: emailSchema,
+  })
+  .readonly();
+
+export const userPasswordResetSchema = z
+  .strictObject({
+    password: passwordSchema,
+    passwordConfirm: passwordSchema,
+    userId: userIdSchema,
+    emailToken: emailTokenSchema,
+  })
+  .refine((v) => v.password === v.passwordConfirm, {
+    message: 'Passwords do not match',
+    path: ['passwordConfirm'],
+  })
+  .readonly();
