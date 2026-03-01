@@ -4,11 +4,11 @@ import { envConfig } from '#config/env-config.js';
 import { NotFoundError, BadRequestError } from '#utils/client-error.js';
 import * as userRepository from '#repositories/user/user-repository.js';
 
-const { DOMAIN: domainURL } = envConfig;
 const logger = createChild({ service: 'verify-email-service' });
+const { DOMAIN: domainURL } = envConfig;
 
 export const verifyEmail = async (emailToken, userId) => {
-  const user = await userRepository.findUserbyId(userId);
+  const user = await userRepository.findUserById(userId);
 
   if (!user) {
     logger.warn('User not found');
@@ -20,12 +20,12 @@ export const verifyEmail = async (emailToken, userId) => {
     throw new BadRequestError('User already verified. Please login');
   }
 
-  const userToken = await userRepository.findVerifyResetToken({
+  const userTokenDoc = await userRepository.findVerifyResetToken({
     _userId: user._id,
     token: emailToken,
   });
 
-  if (!userToken) {
+  if (!userTokenDoc) {
     logger.warn('Invalid or expired token');
     throw new BadRequestError('Invalid or expired token');
   }
@@ -35,7 +35,7 @@ export const verifyEmail = async (emailToken, userId) => {
   await user.save();
 
   // Delete token after use even though doc expires after 15 minutes
-  await userToken.deleteOne();
+  await userTokenDoc.deleteOne();
 
   const payload = {
     name: user.firstName,
