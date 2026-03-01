@@ -1,13 +1,16 @@
-import asyncHandler from 'express-async-handler';
 import * as registerService from '#services/auth/register-service.js';
+import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 
-export const registerUser = asyncHandler(async (req, res) => {
-  const registeredUser = await registerService.registerUser(req.body);
+// POST /api/v1/auth/register
 
-  req.log.info({ userId: registeredUser._id }, 'User registration successful');
+export const registerUser = async (req, res) => {
+  const user = await registerService.registerUser(req.body);
+
+  enrichRequestLogger(req, { userId: user._id });
+  req.log.info('User registration successful');
 
   res.status(201).json({
     success: true,
-    message: `A verification email has been sent to ${registeredUser.email}. Please verify within 15 minutes.`,
+    message: `${user.firstName}, verification email has been sent. Please verify within 15 minutes.`,
   });
-});
+};
