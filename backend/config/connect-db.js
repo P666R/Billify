@@ -1,17 +1,18 @@
 import mongoose from 'mongoose';
+import { envConfig } from './env-config.js';
 import { createChild } from '../utils/logger.js';
 
 export const connectionToDB = async () => {
   const logger = createChild({ service: 'database' });
   try {
     const connectionParams = {
-      dbName: process.env.DB_NAME,
+      dbName: envConfig.DB_NAME,
     };
     const connect = await mongoose.connect(
-      process.env.MONGO_URI,
+      envConfig.MONGO_URI,
       connectionParams
     );
-    const connectionMsg = `database: connected to ${connect.connection.host}`;
+    const connectionMsg = `database: initialized [env: ${envConfig.NODE_ENV}, host: ${connect.connection.host}]`;
     logger.info(connectionMsg);
   } catch (error) {
     const errorMsg = `database error: ${error.message}`;

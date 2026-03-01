@@ -178,7 +178,7 @@ const baseLogger = pino(basePinoConfig);
 
 baseLogger
   .child({ service: 'logger' })
-  .info(`logger: initialized [mode: ${NODE_ENV}, level: ${LOG_LEVEL}]`);
+  .info(`logger: initialized [env: ${NODE_ENV}, level: ${LOG_LEVEL}]`);
 
 export { baseLogger };
 

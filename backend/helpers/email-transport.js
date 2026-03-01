@@ -26,7 +26,7 @@ const getTransporter = () => {
 const connectEmailTransport = async () => {
   try {
     await getTransporter().verify();
-    const connectionMsg = `email-transport: connected to ${isProd ? 'mailgun' : 'mailhog'}`;
+    const connectionMsg = `email-transport: initialized [env: ${isProd ? 'production' : 'development'}, service: ${isProd ? 'mailgun' : 'mailhog'}]`;
     logger.info(connectionMsg);
   } catch (error) {
     const errorMsg = `email-transport error: ${error.message}`;

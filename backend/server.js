@@ -68,5 +68,5 @@ process.on('SIGTERM', () => {
 
 // Start server
 server.listen(PORT, () => {
-  logger.info(`server: running in ${NODE_ENV} mode on port ${PORT}`);
+  logger.info(`server: initialized [env: ${NODE_ENV}, port: ${PORT}]`);
 });
