@@ -1,17 +1,18 @@
-import asyncHandler from 'express-async-handler';
+import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 import * as verifyEmailService from '#services/auth/verify-email-service.js';
 
 //  GET /api/v1/auth/verify/:emailToken/:userId
 
-export const verifyEmail = asyncHandler(async (req, res) => {
+export const verifyEmail = async (req, res) => {
   const { emailToken, userId } = req.params;
 
-  const verifiedUser = await verifyEmailService.verifyEmail(emailToken, userId);
+  const user = await verifyEmailService.verifyEmail(emailToken, userId);
 
-  req.log.info({ userId: verifiedUser._id }, 'Email verified successfully');
+  enrichRequestLogger(req, { userId: user._id });
+  req.log.info('Email verified successfully');
 
   res.status(200).json({
     success: true,
     message: 'Email verified successfully',
   });
-});
+};
