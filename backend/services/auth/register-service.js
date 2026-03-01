@@ -5,8 +5,8 @@ import { envConfig } from '#config/env-config.js';
 import { ConflictError } from '#utils/client-error.js';
 import * as userRepository from '#repositories/user/user-repository.js';
 
-const { DOMAIN: domainURL } = envConfig;
 const logger = createChild({ service: 'register-service' });
+const { DOMAIN: domainURL } = envConfig;
 
 export const registerUser = async (user) => {
   const { email } = user;
@@ -23,13 +23,13 @@ export const registerUser = async (user) => {
 
   // Token for email verification
   const verificationToken = randomBytes(32).toString('hex');
-  let emailVerificationToken = await userRepository.createVerifyResetToken({
+  let emailVerificationTokenDoc = await userRepository.createVerifyResetToken({
     _userId: registeredUser._id,
     token: verificationToken,
   });
 
   // Send verification email
-  const emailLink = `${domainURL}/api/v1/auth/verify/${emailVerificationToken.token}/${registeredUser._id}`;
+  const emailLink = `${domainURL}/api/v1/auth/verify/${emailVerificationTokenDoc.token}/${registeredUser._id}`;
   const payload = {
     name: registeredUser.firstName,
     link: emailLink,
