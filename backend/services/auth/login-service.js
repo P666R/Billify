@@ -22,55 +22,55 @@ export const loginUser = async (email, password, currentCookieToken) => {
   const passwordMatch = await verifyPassword(password, storedHash);
 
   if (!existingUser || !passwordMatch) {
-    logger.warn('Invalid credentials');
+    logger.info('Invalid credentials');
     throw new UnauthorizedError('Invalid credentials');
   }
 
   // 3. Status checks
   if (!existingUser.isEmailVerified) {
-    logger.warn('Email not verified');
+    logger.info('Email not verified');
     throw new BadRequestError(
       'Email not verified. Check your email for verification link'
     );
   }
   if (!existingUser.active) {
-    logger.warn('Account deactivated');
+    logger.info('Account deactivated');
     throw new BadRequestError('Account deactivated. Please contact support');
   }
 
-  // 4. Token Reuse Detection & Session Theft Protection
-  if (
-    currentCookieToken &&
-    !existingUser.refreshToken.includes(currentCookieToken)
-  ) {
-    // The token was used before or is fake/stolen
-    // Invalidate all sessions
-    existingUser.refreshToken = [];
-    await existingUser.save();
+  // 4. Token reuse detection & session theft protection
+  if (currentCookieToken) {
+    try {
+      // Check if this is a legitimate token we actually signed
+      jwt.verify(currentCookieToken, JWT_REFRESH_SECRET_KEY);
 
-    logger.warn({ userId: existingUser._id }, 'Refresh token reuse detected');
-    throw new UnauthorizedError('Potential session theft. Please log in again');
+      // If its a real token but not in our DB its a sign of theft/reuse
+      if (!existingUser.refreshToken.includes(currentCookieToken)) {
+        existingUser.refreshToken = []; // Invalidate all sessions
+        await existingUser.save();
+
+        logger.warn({ userId: existingUser._id }, 'Token reuse detected');
+        throw new UnauthorizedError('Session expired. Please login again');
+      }
+    } catch (error) {
+      // If jwt verification fails its just an old/fake cookie
+      // We dont need to wipe sessions for same
+      logger.info(`JWT: ${error.message}. Ignoring it during login`);
+    }
   }
 
   // 5. Generate new tokens
   const accessToken = jwt.sign(
-    {
-      id: existingUser._id,
-      roles: existingUser.roles,
-    },
+    { id: existingUser._id, roles: existingUser.roles },
     JWT_ACCESS_SECRET_KEY,
     {
       expiresIn: '10m',
     }
   );
   const newRefreshToken = jwt.sign(
-    {
-      id: existingUser._id,
-    },
+    { id: existingUser._id },
     JWT_REFRESH_SECRET_KEY,
-    {
-      expiresIn: '1d',
-    }
+    { expiresIn: '1d' }
   );
 
   // 6. Refresh Token Rotation Logic
@@ -87,9 +87,5 @@ export const loginUser = async (email, password, currentCookieToken) => {
 
   await existingUser.save();
 
-  return {
-    user: existingUser,
-    accessToken,
-    refreshToken: newRefreshToken,
-  };
+  return { user: existingUser, accessToken, refreshToken: newRefreshToken };
 };

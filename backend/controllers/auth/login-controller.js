@@ -5,7 +5,7 @@ import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  const currentCookieToken = req.cookies?.jwt;
+  const { jwt: currentCookieToken } = req.cookies;
 
   // Setup cookie options
   const cookieOptions = {
@@ -28,10 +28,10 @@ export const loginUser = async (req, res) => {
     enrichRequestLogger(req, { userId: user._id });
     req.log.info('User logged in successfully');
 
-    // 4. Set cookies
+    // 3. Set cookie with refresh token
     res.cookie('jwt', refreshToken, cookieOptions);
 
-    // 5. Send response
+    // 4. Send response with access token
     res.status(200).json({
       success: true,
       user: {
@@ -44,8 +44,8 @@ export const loginUser = async (req, res) => {
       accessToken,
     });
   } catch (error) {
-    //  Clear cookie on any login error
-    const { maxAge: _maxAge, ...clearOptions } = cookieOptions;
+    // Clear cookie on any login error
+    const { maxAge: _, ...clearOptions } = cookieOptions; // NOSONAR
     res.clearCookie('jwt', clearOptions);
     throw error;
   }
