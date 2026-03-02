@@ -12,12 +12,12 @@ export const passwordResetRequest = async (email) => {
   const existingUser = await userRepository.findUserByEmail({ email });
 
   if (!existingUser) {
-    logger.warn('User not found');
+    logger.info('User not found');
     throw new NotFoundError('User not found');
   }
 
   if (!existingUser.isEmailVerified) {
-    logger.warn('Email not verified');
+    logger.info('Email not verified');
     throw new BadRequestError(
       'Email not verified. Check email for verification link'
     );
@@ -45,7 +45,7 @@ export const passwordResetRequest = async (email) => {
     existingUser.email,
     'Password Reset Request',
     payload,
-    'requestResetPassword.handlebars'
+    'request-reset-password.handlebars'
   );
 
   return existingUser;
@@ -58,7 +58,7 @@ export const userPasswordReset = async ({
   emailToken,
 }) => {
   if (password !== passwordConfirm) {
-    logger.warn('Passwords do not match');
+    logger.info('Passwords do not match');
     throw new BadRequestError('Passwords do not match');
   }
 
@@ -68,7 +68,7 @@ export const userPasswordReset = async ({
   });
 
   if (!passwordResetTokenDoc) {
-    logger.warn('Invalid or expired token');
+    logger.info('Invalid or expired token');
     throw new BadRequestError('Invalid or expired token');
   }
 
@@ -77,7 +77,7 @@ export const userPasswordReset = async ({
   );
 
   if (!existingUser) {
-    logger.warn('User not found');
+    logger.info('User not found');
     throw new NotFoundError('User not found');
   }
 
@@ -95,7 +95,7 @@ export const userPasswordReset = async ({
     existingUser.email,
     'Password Reset Success',
     payload,
-    'resetPassword.handlebars'
+    'reset-password.handlebars'
   );
 
   return existingUser;

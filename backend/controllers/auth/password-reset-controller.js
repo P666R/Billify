@@ -17,6 +17,8 @@ export const passwordResetRequest = async (req, res) => {
   });
 };
 
+// POST /api/v1/auth/reset_password
+
 export const userPasswordReset = async (req, res) => {
   const { password, passwordConfirm, userId, emailToken } = req.body;
 
