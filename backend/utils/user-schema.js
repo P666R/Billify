@@ -78,15 +78,23 @@ export const verifyEmailSchema = z
   })
   .readonly();
 
-export const loginUserSchema = z
+export const loginBodySchema = z
   .strictObject({
     email: emailSchema,
     password: passwordSchema,
   })
   .readonly();
 
-export const refreshTokenSchema = z
-  .strictObject({
+export const loginCookieSchema = z
+  // not strictObject to allow "extra" cookies we don't control
+  .object({
+    jwt: jwtSchema.optional(),
+  })
+  .optional()
+  .readonly();
+
+export const refreshTokenCookieSchema = z
+  .object({
     jwt: jwtSchema,
   })
   .readonly();
