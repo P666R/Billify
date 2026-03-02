@@ -1,8 +1,11 @@
 import pino from 'pino';
+import * as z from 'zod';
 import { fileURLToPath } from 'node:url';
 import { join, dirname } from 'node:path';
+import { StatusCodes } from 'http-status-codes';
 import { envConfig } from '#config/env-config.js';
 import { loggerStore } from '#helpers/context-provider.js';
+import { formatZodError } from '#middlewares/error-middleware.js';
 import packageJson from '../../package.json' with { type: 'json' };
 
 const { NODE_ENV, LOG_LEVEL, isProd, isDev, isTest } = envConfig;
@@ -10,8 +13,25 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const logDir = join(__dirname, '../../logs');
 
+function zodErrorSerializer(error) {
+  const { summary, details, type } = formatZodError(error);
+  return {
+    message: summary,
+    ...(isDev && error.stack && { stack: error.stack }),
+    type,
+    statusCode: StatusCodes.UNPROCESSABLE_ENTITY,
+    errorCode: 'VALIDATION_ERROR',
+    isOperational: true,
+    details,
+  };
+}
+
 // Error serializer for development environment
 export const errorSerializerDev = (error) => {
+  if (error instanceof z.ZodError) {
+    return zodErrorSerializer(error);
+  }
+
   const base = {
     message: error.message,
     stack: error.stack,
@@ -44,6 +64,10 @@ export const errorSerializerDev = (error) => {
 
 // Error serializer for production environment
 export const errorSerializerProd = (error) => {
+  if (error instanceof z.ZodError) {
+    return zodErrorSerializer(error);
+  }
+
   const base = {
     message: error.message,
     type: error.name,
