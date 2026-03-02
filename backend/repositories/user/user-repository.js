@@ -38,7 +38,7 @@ export const findUserByRefTAndRotateRefT = (oldToken, newToken) =>
       },
     ],
     {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
       updatePipeline: true,
     }
@@ -48,7 +48,7 @@ export const findUserByRefTAndDeleteRefT = (refreshToken) =>
   User.findOneAndUpdate(
     { refreshToken },
     { $pull: { refreshToken } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
 export const createUser = (data) => User.create(data);
