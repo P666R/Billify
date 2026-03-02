@@ -11,6 +11,46 @@ export const findUserById = (id) => User.findById(id);
 
 export const findUserByRefreshToken = (data) => User.findOne(data);
 
+export const findUserByRefTAndRotateRefT = (oldToken, newToken) =>
+  User.findOneAndUpdate(
+    { refreshToken: oldToken },
+    [
+      {
+        $set: {
+          refreshToken: {
+            $concatArrays: [
+              {
+                $filter: {
+                  input: '$refreshToken',
+                  as: 'token',
+                  cond: { $ne: ['$$token', oldToken] },
+                },
+              },
+              [newToken],
+            ],
+          },
+        },
+      },
+      {
+        $set: {
+          refreshToken: { $slice: ['$refreshToken', -5] },
+        },
+      },
+    ],
+    {
+      new: true,
+      runValidators: true,
+      updatePipeline: true,
+    }
+  );
+
+export const findUserByRefTAndDeleteRefT = (refreshToken) =>
+  User.findOneAndUpdate(
+    { refreshToken },
+    { $pull: { refreshToken } },
+    { new: true }
+  );
+
 export const createUser = (data) => User.create(data);
 
 // VerifyResetToken operations
