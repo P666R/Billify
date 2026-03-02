@@ -1,12 +1,21 @@
 import rateLimit from 'express-rate-limit';
 
 const limitHandler = (req, res, _next, options) => {
-  req.log.warn(
+  const isAuth = options.message.error.includes('login attempts');
+  const reason = isAuth ? 'AUTH_PROTECTION' : 'API_ABUSE';
+  const status = isAuth ? 'warn' : 'error';
+
+  // Capture the User-Agent for bot identification with log bloat attack prevention
+  const userAgent = req.headers['user-agent']?.substring(0, 255) || 'unknown';
+
+  req.log[status](
     {
       ip: req.ip,
       method: req.method,
       url: req.url,
       errorCode: 'TOO_MANY_REQUESTS',
+      reason,
+      userAgent,
     },
     `${options.message.error}`
   );
@@ -16,7 +25,7 @@ const limitHandler = (req, res, _next, options) => {
     correlationId: req.correlationId,
     errorCode: 'TOO_MANY_REQUESTS',
     message: options.message.error,
-    status: 'warn',
+    status,
     timestamp: new Date().toISOString(),
   });
 };
