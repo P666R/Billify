@@ -1,3 +1,4 @@
+import * as z from 'zod';
 import { randomUUID } from 'node:crypto';
 import {
   createChild,
@@ -35,8 +36,10 @@ export const httpLoggingMiddleware = () => {
     },
 
     customErrorMessage: (_req, _res, err) => {
-      const errorCode =
-        err instanceof AppError ? err.errorCode : 'UNKNOWN_ERROR';
+      let errorCode = 'UNKNOWN_ERROR';
+      if (err instanceof z.ZodError) errorCode = 'VALIDATION_ERROR';
+      if (err instanceof AppError) errorCode = err.errorCode;
+
       return `✗ Request Failed [${errorCode}]`;
     },
 
