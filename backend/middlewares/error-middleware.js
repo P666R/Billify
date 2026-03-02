@@ -165,17 +165,14 @@ function serializeCause(cause) {
 /**
  * Format Zod validation errors
  */
-function formatZodError(error) {
-  // Nested object structure matching the schema
-  const tree = z.treeifyError(error);
-  // Readable multi-line summary string
-  const summary = z.prettifyError(error);
+export function formatZodError(error) {
+  const summary = error.issues
+    .map((iss) => `${iss.message} → ${iss.path.join('.')}`)
+    .join('. ');
 
   return {
     summary,
     details: {
-      tree,
-      count: error.issues.length,
       // Flat list of issues for simpler log indexing
       issues: error.issues.map((iss) => ({
         code: iss.code,
