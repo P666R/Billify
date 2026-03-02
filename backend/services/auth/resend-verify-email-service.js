@@ -12,12 +12,12 @@ export const resendVerifyEmail = async (email) => {
   const existingUser = await userRepository.findUserByEmail({ email });
 
   if (!existingUser) {
-    logger.warn('User not found');
+    logger.info('User not found');
     throw new NotFoundError('User not found');
   }
 
   if (existingUser.isEmailVerified) {
-    logger.warn('User already verified. Please login');
+    logger.info('User already verified. Please login');
     throw new BadRequestError('User already verified. Please login');
   }
 

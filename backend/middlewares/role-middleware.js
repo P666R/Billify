@@ -9,14 +9,14 @@ export const ROLES = {
 export const checkRole = (...allowedRoles) => {
   return (req, _res, next) => {
     if (!req.user || !req.roles) {
-      req.log.warn('Not authenticated');
+      req.log.info('Not authenticated');
       throw new UnauthorizedError('Not authenticated');
     }
 
     const roleFound = req.roles.some((role) => allowedRoles.includes(role));
 
     if (!roleFound) {
-      req.log.warn('Access denied');
+      req.log.info('Access denied');
       throw new ForbiddenError('Access denied');
     }
 

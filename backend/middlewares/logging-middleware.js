@@ -42,7 +42,8 @@ export const httpLoggingMiddleware = () => {
 
     customLogLevel: (_req, res, err) => {
       if (err || res.statusCode >= 500) return 'error';
-      if (res.statusCode >= 400) return 'warn';
+      // If the user did something wrong (4xx), it's just info to avoid alert fatigue
+      if (res.statusCode >= 400) return 'info';
       return 'info';
     },
 

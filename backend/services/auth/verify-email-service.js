@@ -11,12 +11,12 @@ export const verifyEmail = async (emailToken, userId) => {
   const user = await userRepository.findUserById(userId);
 
   if (!user) {
-    logger.warn('User not found');
+    logger.info('User not found');
     throw new NotFoundError('User not found');
   }
 
   if (user.isEmailVerified) {
-    logger.warn('User already verified. Please login');
+    logger.info('User already verified. Please login');
     throw new BadRequestError('User already verified. Please login');
   }
 
@@ -26,7 +26,7 @@ export const verifyEmail = async (emailToken, userId) => {
   });
 
   if (!userTokenDoc) {
-    logger.warn('Invalid or expired token');
+    logger.info('Invalid or expired token');
     throw new BadRequestError('Invalid or expired token');
   }
 

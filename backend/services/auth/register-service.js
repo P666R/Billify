@@ -14,7 +14,7 @@ export const registerUser = async (user) => {
   // Check if user already exists
   const userExists = await userRepository.findUserByEmail({ email });
   if (userExists) {
-    logger.warn('Email already registered');
+    logger.info('Email already registered');
     throw new ConflictError('Email already registered');
   }
 

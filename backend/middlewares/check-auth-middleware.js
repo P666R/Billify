@@ -9,7 +9,7 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
-    req.log.warn('No token provided');
+    req.log.info('No token provided');
     throw new UnauthorizedError('No token provided');
   }
 
@@ -23,7 +23,7 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
       .select('-password');
 
     if (!user) {
-      req.log.warn('User no longer exists');
+      req.log.info('User no longer exists');
       throw new UnauthorizedError('User no longer exists');
     }
 
@@ -39,7 +39,7 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
 
     next();
   } catch (error) {
-    req.log.warn({ err: error }, 'JWT verification failed');
+    req.log.info({ err: error }, 'JWT verification failed');
 
     // If already one of our AppErrors, re-throw
     if (error.isOperational) throw error;
