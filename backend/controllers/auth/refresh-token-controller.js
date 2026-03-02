@@ -44,7 +44,7 @@ export const newAccessToken = async (req, res) => {
     });
   } catch (error) {
     // Clear cookie on any error
-    const { maxAge: _maxAge, ...clearOptions } = cookieOptions;
+    const { maxAge: _, ...clearOptions } = cookieOptions; // NOSONAR
     res.clearCookie('jwt', clearOptions);
     throw error;
   }

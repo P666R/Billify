@@ -8,93 +8,53 @@ const logger = createChild({ service: 'refresh-token-service' });
 const { JWT_ACCESS_SECRET_KEY, JWT_REFRESH_SECRET_KEY } = envConfig;
 
 export const newAccessToken = async (refreshToken) => {
-  // 1. Find existing user with this refresh token
-  let existingUser = await userRepository.findUserByRefreshToken({
-    refreshToken,
-  });
-
-  // 2. Token reuse detection
-  if (!existingUser) {
-    logger.warn('Refresh token not found in database');
-    // Token might still be valid but not in database
-    // Try to verify it to detect potential token reuse attack
-    try {
-      const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET_KEY);
-      // If verification succeeds, this could be a reuse attempt
-      // Invalidate all sessions for this user
-      const hackedUser = await userRepository.findUserById(decoded.id);
-      if (hackedUser) {
-        hackedUser.refreshToken = [];
-        await hackedUser.save();
-        logger.error(
-          { userId: hackedUser._id },
-          'Potential token reuse detected. All sessions revoked'
-        );
-      }
-    } catch (error) {
-      logger.warn(
-        { cause: error.message },
-        'Refresh token is invalid or expired'
-      );
-    }
-    throw new ForbiddenError('Session expired or invalid. Please login again');
-  }
-
-  // 3. Remove the old refresh token from the array
-  const newRefreshTokenArray = existingUser.refreshToken.filter(
-    (rt) => rt !== refreshToken
-  );
-
-  // 4. Verify the refresh token JWT
+  // 1. Verify JWT integrity first (Zero DB cost)
+  // We check the signature and expiry before hitting the database
   let decoded;
+
   try {
     decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET_KEY);
   } catch (error) {
-    logger.warn(
-      { userId: existingUser._id },
-      'Refresh token is invalid or expired'
-    );
-    // Token is invalid, save cleaned array and throw
-    existingUser.refreshToken = newRefreshTokenArray;
-    await existingUser.save();
-    throw new ForbiddenError('Session expired', { cause: error });
+    // If JWT is physically expired/fake, we wont do theft detection
+    logger.info(`JWT: ${error.message}`);
+    throw new ForbiddenError('Session expired. Please login again');
   }
 
-  // 5. Check if user ID matches
-  if (existingUser._id.toString() !== decoded.id) {
-    logger.warn(
-      { userId: existingUser._id },
-      'Identity mismatch during rotation'
-    );
-    throw new ForbiddenError('Session expired or invalid. Please login again');
+  // 2. Pre generate the next Refresh Token in the chain
+  // We use ID from decoded payload because the DB hasnt been hit yet
+  const newRefreshToken = jwt.sign({ id: decoded.id }, JWT_REFRESH_SECRET_KEY, {
+    expiresIn: '1d',
+  });
+
+  // 3. Atomic rotation - swap used token for new one in single DB op
+  // Prevents race conditions where 2 simultaneous clicks could break the session
+  const existingUser = await userRepository.findUserByRefTAndRotateRefT(
+    refreshToken,
+    newRefreshToken
+  );
+
+  // 4. Token reuse (theft) detection
+  // If JWT passed Step 1 but not found in Step 3 it has been used before
+  if (!existingUser) {
+    // Use id from the stolen token to find the victim
+    const hackedUser = await userRepository.findUserById(decoded.id);
+    if (hackedUser) {
+      hackedUser.refreshToken = [];
+      await hackedUser.save();
+      logger.warn(
+        { userId: hackedUser._id },
+        'Potential token reuse detected. All sessions revoked'
+      );
+    }
+    throw new ForbiddenError('Session expired. Please login again');
   }
 
-  // 6. Generate new tokens
+  // 5. Generate new short lived access tokens for frontend
   const accessToken = jwt.sign(
-    {
-      id: existingUser._id,
-      roles: existingUser.roles,
-    },
+    { id: existingUser._id, roles: existingUser.roles },
     JWT_ACCESS_SECRET_KEY,
     { expiresIn: '10m' }
   );
 
-  const newRefreshToken = jwt.sign(
-    { id: existingUser._id },
-    JWT_REFRESH_SECRET_KEY,
-    { expiresIn: '1d' }
-  );
-
-  // 7. Update refresh token array (keep only 5 most recent)
-  existingUser.refreshToken = [...newRefreshTokenArray, newRefreshToken].slice(
-    -5
-  );
-
-  await existingUser.save();
-
-  return {
-    user: existingUser,
-    accessToken,
-    refreshToken: newRefreshToken,
-  };
+  return { user: existingUser, accessToken, refreshToken: newRefreshToken };
 };
