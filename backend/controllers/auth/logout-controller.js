@@ -4,7 +4,7 @@ import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 // POST /api/v1/auth/logout
 
 export const logoutUser = async (req, res) => {
-  const currentCookieToken = req.cookies?.jwt;
+  const { jwt: currentCookieToken } = req.cookies;
 
   // Setup cookie options
   const cookieOptions = {
@@ -14,28 +14,29 @@ export const logoutUser = async (req, res) => {
     path: '/',
   };
 
-  try {
-    const user = await logoutService.logoutUser(currentCookieToken);
+  res.clearCookie('jwt', cookieOptions);
 
-    res.clearCookie('jwt', cookieOptions);
-
-    if (!user) {
-      return res.status(200).json({
-        success: true,
-        message: 'Already logged out',
-      });
-    }
-
-    enrichRequestLogger(req, { userId: user._id });
-    req.log.info('User logged out successfully');
-
-    res.status(200).json({
+  if (!currentCookieToken) {
+    return res.status(200).json({
       success: true,
-      message: `${user.firstName}, you have been logged out successfully`,
+      message: 'Already logged out',
     });
-  } catch (error) {
-    //  Clear cookie on any logout error
-    res.clearCookie('jwt', cookieOptions);
-    throw error;
   }
+
+  const user = await logoutService.logoutUser(currentCookieToken);
+
+  if (!user) {
+    return res.status(200).json({
+      success: true,
+      message: 'Already logged out',
+    });
+  }
+
+  enrichRequestLogger(req, { userId: user._id });
+  req.log.info('User logged out successfully');
+
+  res.status(200).json({
+    success: true,
+    message: `${user.firstName}, you have been logged out successfully`,
+  });
 };
