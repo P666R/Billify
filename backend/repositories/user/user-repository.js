@@ -9,6 +9,32 @@ export const findUserByEmailWithPassword = (data) =>
 
 export const findUserById = (id) => User.findById(id);
 
+export const findUserByIdLean = (
+  id,
+  projection = '-refreshToken -roles -__v'
+) => User.findById(id).select(projection).lean();
+
+export const findUserByIdAndUpdate = (id, data) =>
+  User.findByIdAndUpdate(id, data, {
+    returnDocument: 'after',
+    runValidators: true,
+  })
+    .select('-refreshToken -roles -__v')
+    .lean();
+
+export const findUserByIdAndDelete = (id) =>
+  User.findByIdAndDelete(id).select('-refreshToken -roles -__v').lean();
+
+export const countAllUsers = () => User.countDocuments({});
+
+export const findAllUsers = (pageSize, page) =>
+  User.find()
+    .sort({ createdAt: -1 })
+    .select('-refreshToken -__v')
+    .limit(pageSize)
+    .skip((page - 1) * pageSize)
+    .lean();
+
 export const findUserByRefreshToken = (data) => User.findOne(data);
 
 export const findUserByRefTAndRotateRefT = (oldToken, newToken) =>
