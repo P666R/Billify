@@ -43,6 +43,22 @@ const passwordSchema = z
     error: 'Password must be 8+ chars with upper, lower, number, and symbol',
   });
 
+const phoneNumberSchema = z.string().refine((v) => validator.isMobilePhone(v), {
+  error:
+    "Please provide a valid phone number, begin with '+', then country code and number",
+});
+
+const businessNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Business name cannot be empty');
+
+const addressSchema = z.string().trim().min(1, 'Address cannot be empty');
+
+const citySchema = z.string().trim().min(1, 'City cannot be empty');
+
+const countrySchema = z.string().trim().min(1, 'Country cannot be empty');
+
 const emailTokenSchema = z.hash('sha256', {
   enc: 'hex',
   error: 'Invalid email token',
@@ -121,5 +137,39 @@ export const userPasswordResetSchema = z
   .refine((v) => v.password === v.passwordConfirm, {
     message: 'Passwords do not match',
     path: ['passwordConfirm'],
+  })
+  .readonly();
+
+export const getAllAccountsQuerySchema = z
+  .object({
+    pageNumber: z.coerce.number().positive().catch(1), // NOSONAR
+  })
+  .readonly();
+
+export const updateUserProfileBodySchema = z
+  .strictObject({
+    firstName: firstNameSchema,
+    lastName: lastNameSchema,
+    phoneNumber: phoneNumberSchema,
+    businessName: businessNameSchema,
+    address: addressSchema,
+    city: citySchema,
+    country: countrySchema,
+  })
+  .partial()
+  .refine((v) => Object.keys(v).length > 0, {
+    error: 'At least one field must be provided for update',
+  })
+  .readonly();
+
+export const deleteUserAccountParamsSchema = z
+  .strictObject({
+    id: userIdSchema,
+  })
+  .readonly();
+
+export const deactivateUserParamsSchema = z
+  .strictObject({
+    id: userIdSchema,
   })
   .readonly();
