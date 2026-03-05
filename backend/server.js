@@ -9,7 +9,9 @@ import {
 import { createChild } from '#utils/logger.js';
 import { envConfig } from '#config/env-config.js';
 import { authRouter } from '#routes/auth-routes.js';
+import { userRouter } from '#routes/user-routes.js';
 import { connectionToDB } from '#config/connect-db.js';
+import { apiLimiter } from '#middlewares/api-limiter.js';
 import { httpLoggingMiddleware } from '#middlewares/logging-middleware.js';
 
 const { PORT, NODE_ENV } = envConfig;
@@ -41,6 +43,7 @@ app.get('/api/v1/test', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/user', apiLimiter, userRouter);
 
 // Error handlers
 app.use(notFoundHandlerMiddleware);
