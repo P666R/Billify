@@ -1,11 +1,10 @@
 import jwt from 'jsonwebtoken';
-import asyncHandler from 'express-async-handler';
 import { envConfig } from '#config/env-config.js';
 import { UnauthorizedError } from '#utils/client-error.js';
 import * as userRepository from '#repositories/user/user-repository.js';
 import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 
-export const checkAuth = asyncHandler(async (req, _res, next) => {
+export const checkAuth = async (req, _res, next) => {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader?.startsWith('Bearer ')) {
@@ -18,23 +17,29 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
   try {
     const decoded = jwt.verify(jwtToken, envConfig.JWT_ACCESS_SECRET_KEY);
 
-    const user = await userRepository
-      .findUserById(decoded.id)
-      .select('-password');
+    const user = await userRepository.findUserByIdLean(
+      decoded.id,
+      '-refreshToken -__v'
+    );
 
     if (!user) {
       req.log.info('User no longer exists');
       throw new UnauthorizedError('User no longer exists');
     }
 
+    if (!user.active) {
+      req.log.info('Account has been deactivated');
+      throw new UnauthorizedError('Account has been deactivated');
+    }
+
     // Attach data to request
     req.user = user;
-    req.roles = decoded.roles;
+    req.roles = user.roles;
 
     // Attach data to logger
     enrichRequestLogger(req, {
       userId: user._id,
-      roles: decoded.roles,
+      roles: user.roles,
     });
 
     next();
@@ -47,4 +52,4 @@ export const checkAuth = asyncHandler(async (req, _res, next) => {
     // Else wrap JWT errors into UnauthorizedError
     throw new UnauthorizedError('JWT verification failed', { cause: error });
   }
-});
+};
