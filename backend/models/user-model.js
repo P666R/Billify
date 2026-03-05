@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
-import { USER, ADMIN } from '#constants/index.js';
+import { ROLES } from '#constants/index.js';
 import { hashPassword, verifyPassword } from '#utils/password.js';
 
 const userSchema = new mongoose.Schema(
@@ -96,9 +96,9 @@ const userSchema = new mongoose.Schema(
     passwordChangedAt: Date,
     roles: {
       type: [String],
-      default: [USER],
+      default: [ROLES.USER],
       enum: {
-        values: [USER, ADMIN],
+        values: [ROLES.ADMIN, ROLES.USER],
         message: '{VALUE} is not a valid role',
       },
     },
