@@ -1,0 +1,54 @@
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Auth styling */
+.auth-svg {
+  font-size: 6rem;
+}
+
+.verified {
+  color: limegreen;
+  font-size: 4rem;
+  margin-top: -25px;
+}
+
+.google-icon {
+  font-size: 4rem;
+}
+
+/* Document styling (invoices, etc.) */
+.title {
+  background-color: rgba(238, 235, 235, 0.954);
+  border-bottom: 1px solid rgb(17, 65, 141);
+  color: rgb(17, 65, 141);
+  font-weight: 500;
+  padding: 15px 0px;
+  text-align: center;
+}
+
+.billItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(17, 65, 141);
+}
+
+.billItem p,
+.billItem h4 {
+  padding: 3px;
+}
+
+.toolBar {
+  margin-top: 50px;
+}
