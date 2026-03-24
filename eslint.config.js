@@ -18,9 +18,9 @@ export default defineConfig([
   {
     files: ['**/*.{js,jsx}'],
     extends: [js.configs.recommended],
-    rules: {
-      'no-console': 'warn',
-    },
+    // rules: {
+    //   'no-console': 'warn',
+    // },
   },
   // Backend-specific configuration
   {
