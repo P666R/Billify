@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import { FcGoogle } from 'react-icons/fc';
+import { fluidType } from '../customTheme';
 
 export const GoogleLogin = () => {
   const google = () => {
@@ -8,7 +9,7 @@ export const GoogleLogin = () => {
   };
   return (
     <Box sx={{ cursor: 'pointer' }} onClick={google}>
-      <FcGoogle className="google-icon" />
+      <FcGoogle className="google-icon" size={fluidType(25, 35)} />
     </Box>
   );
 };
