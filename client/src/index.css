@@ -10,11 +10,7 @@ body {
   font-family: 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-/* Auth styling */
-.auth-svg {
-  font-size: 6rem;
+  scrollbar-gutter: stable;
 }
 
 .verified {
@@ -51,4 +47,32 @@ body {
 
 .toolBar {
   margin-top: 50px;
+}
+
+:root {
+  --toastify-color-success: #2e7d32;
+  --toastify-color-error: #d32f2f;
+  --toastify-color-info: #0288d1;
+
+  --toastify-toast-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.25), 0 4px 6px -4px rgba(0, 0, 0, 0.6),
+    0 20px 25px -5px rgba(0, 0, 0, 0.25);
+
+  --toastify-toast-bd-radius: 8px;
+  --toastify-font-family: 'Roboto', sans-serif;
+  --toastify-z-index: 9999;
+  --toastify-font-size: clamp(0.85rem, 0.7727rem + 0.3864vw, 1.0625rem);
+}
+
+.Toastify__toast-body {
+  font-size: var(--toastify-font-size) !important;
+}
+
+@media only screen and (max-width: 1200px) {
+  .Toastify__toast-container {
+    top: 1rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    max-width: 80vw;
+  }
 }
