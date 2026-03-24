@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import validator from 'validator';
 import { ROLES } from '#constants/index.js';
+import { passwordStrength } from '#utils/password-strength.js';
 import { hashPassword, verifyPassword } from '#utils/password.js';
 
 const userSchema = new mongoose.Schema(
@@ -45,10 +46,13 @@ const userSchema = new mongoose.Schema(
       required: function () {
         return this.provider === 'email';
       },
-      validate: [
-        validator.isStrongPassword,
-        'Password must be 8+ chars with upper, lower, number, and symbol',
-      ],
+      validate: {
+        validator: function (v) {
+          return passwordStrength(v);
+        },
+        message:
+          'Password is too weak. Try a longer phrase or add more unique words',
+      },
     },
     passwordConfirm: {
       type: String,
