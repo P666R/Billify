@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import validator from 'validator';
+import { passwordStrength } from '#utils/password-strength.js';
 
 // Reusable base schemas
 const emailSchema = z
@@ -37,10 +38,10 @@ const lastNameSchema = z
 
 const passwordSchema = z
   .string()
-  .min(1, 'Password is required')
+  .min(8, 'Password must be at least 8 characters long')
   .trim()
-  .refine((v) => validator.isStrongPassword(v), {
-    error: 'Password must be 8+ chars with upper, lower, number, and symbol',
+  .refine((v) => passwordStrength(v), {
+    error: 'Password is too weak. Try a longer phrase or add more unique words',
   });
 
 const phoneNumberSchema = z.string().refine((v) => validator.isMobilePhone(v), {
