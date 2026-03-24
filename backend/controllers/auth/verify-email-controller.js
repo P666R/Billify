@@ -11,8 +11,5 @@ export const verifyEmail = async (req, res) => {
   enrichRequestLogger(req, { userId: user._id });
   req.log.info('Email verified successfully');
 
-  res.status(200).json({
-    success: true,
-    message: 'Email verified successfully',
-  });
+  res.redirect('/auth/verify');
 };
