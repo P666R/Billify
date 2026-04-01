@@ -1,8 +1,11 @@
 import { Box } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 export const AuthWrapper = (
   { children } // NOSONAR
 ) => {
+  const { user } = useSelector((state) => state.auth);
+
   return (
     <Box
       maxWidth="md"
@@ -14,8 +17,7 @@ export const AuthWrapper = (
         flexGrow: 1,
         width: { xs: '80%', sm: '65%', md: '50%' },
         mx: 'auto',
-        my: { xs: '1.5rem' },
-        minHeight: '80dvh',
+        marginTop: user ? 'calc(8dvh + 1rem)' : '1rem',
       }}
     >
       {children}
