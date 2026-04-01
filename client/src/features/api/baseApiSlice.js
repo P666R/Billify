@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { logIn, logOut } from '../auth/authSlice';
 
 const baseQuery = fetchBaseQuery({
   baseUrl: '/api/v1',
@@ -12,9 +13,31 @@ const baseQuery = fetchBaseQuery({
   },
 });
 
+const baseQueryWithRefreshToken = async (args, api, extraOptions) => {
+  let reponse = await baseQuery(args, api, extraOptions);
+
+  if (reponse?.error?.originalStatus === 403) {
+    const refreshResult = await baseQuery(
+      '/auth/new_access_token',
+      api,
+      extraOptions
+    );
+
+    const refreshData = refreshResult.data;
+
+    if (refreshData) {
+      api.dispatch(logIn(refreshData));
+      reponse = await baseQuery(args, api, extraOptions);
+    } else {
+      api.dispatch(logOut());
+    }
+  }
+  return reponse;
+};
+
 export const baseApiSlice = createApi({
   reducerPath: 'api',
-  baseQuery,
+  baseQuery: baseQueryWithRefreshToken,
   tagTypes: ['User', 'Customer', 'Document'],
   endpoints: () => ({}),
 });
