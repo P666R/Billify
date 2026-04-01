@@ -5,7 +5,12 @@ export const Layout = () => {
   return (
     <Box
       component="main"
-      sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        minHeight: '86dvh',
+      }}
     >
       <Outlet />
     </Box>
