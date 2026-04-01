@@ -1,5 +1,6 @@
-import { baseApiSlice } from '../api/baseApiSlice';
+import { toast } from 'react-toastify';
 import { logIn, logOut } from './authSlice';
+import { baseApiSlice } from '../api/baseApiSlice';
 
 // baseUrl = '/api/v1'
 
@@ -11,7 +12,16 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success('Registration successful');
+        } catch (err) {
+          toast.error(err?.error?.data?.message || 'Registration failed');
+        }
+      },
     }),
+
     loginUser: build.mutation({
       query: (body) => ({
         url: '/auth/login',
@@ -22,11 +32,13 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           dispatch(logIn(data));
+          toast.success('Login successful');
         } catch (err) {
-          console.log(err);
+          toast.error(err?.error?.data?.message || 'Login failed');
         }
       },
     }),
+
     logoutUser: build.mutation({
       query: () => ({
         url: '/auth/logout',
@@ -35,14 +47,15 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
-        } catch (err) {
-          console.log(err);
-        } finally {
           dispatch(logOut());
           dispatch(baseApiSlice.util.resetApiState());
+          toast.success('Logout successful');
+        } catch (err) {
+          toast.error(err?.error?.data?.message || 'Logout failed');
         }
       },
     }),
+
     resendVerifyEmail: build.mutation({
       query: (body) => ({
         url: '/auth/resend_email_token',
@@ -50,6 +63,7 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         body,
       }),
     }),
+
     passwordResetRequest: build.mutation({
       query: (body) => ({
         url: '/auth/reset_password_request',
@@ -57,6 +71,7 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         body,
       }),
     }),
+
     resetPassword: build.mutation({
       query: (body) => ({
         url: '/auth/reset_password',
