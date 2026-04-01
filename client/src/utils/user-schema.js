@@ -39,10 +39,8 @@ const lastNameSchema = z
 const passwordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters long')
-  .trim()
-  .refine((v) => passwordStrength(v), {
-    error: 'Password is too weak. Try a longer phrase or add more unique words',
-  });
+  .max(80, 'Password cannot be longer than 80 characters')
+  .trim();
 
 // Schemas
 export const registerUserSchema = z
@@ -51,11 +49,21 @@ export const registerUserSchema = z
     username: usernameSchema,
     firstName: firstNameSchema,
     lastName: lastNameSchema,
-    password: passwordSchema,
+    password: passwordSchema.refine((v) => passwordStrength(v), {
+      error:
+        'Password is too weak. Try a longer phrase or add more unique words',
+    }),
     passwordConfirm: z.string().min(1, 'Confirm password is required').trim(),
   })
   .refine((v) => v.password === v.passwordConfirm, {
     error: 'Passwords do not match',
     path: ['passwordConfirm'],
+  })
+  .readonly();
+
+export const loginUserSchema = z
+  .strictObject({
+    email: emailSchema,
+    password: passwordSchema,
   })
   .readonly();
