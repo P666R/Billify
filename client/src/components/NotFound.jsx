@@ -7,8 +7,10 @@ import {
   useTheme,
 } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router';
 import { FaGhost, FaArrowLeft, FaHome } from 'react-icons/fa';
+
 import { fluidType } from '../customTheme';
 
 const MotionContainer = motion.create(Container);
@@ -44,6 +46,7 @@ const ghostVariants = {
 };
 
 export const NotFound = () => {
+  const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -60,12 +63,12 @@ export const NotFound = () => {
         justifyContent: 'center',
         flexGrow: 1,
         textAlign: 'center',
-        minHeight: '80dvh', // Ensures centering on mobile browsers
+        marginTop: user ? 'calc(8dvh + 1.5rem)' : '1.5rem',
       }}
     >
       <motion.div variants={ghostVariants} animate="animate">
-        <Box sx={{ color: theme.palette.text.secondary, mb: 4 }}>
-          <FaGhost size={fluidType(80, 120)} />
+        <Box sx={{ color: theme.palette.text.secondary }}>
+          <FaGhost size={fluidType(80, 100)} />
         </Box>
       </motion.div>
 
@@ -74,9 +77,9 @@ export const NotFound = () => {
         variant="h1"
         fontWeight={900}
         sx={{
-          fontSize: fluidType(80, 140),
+          fontSize: fluidType(60, 120),
           lineHeight: 1,
-          mb: 2,
+          my: 2,
           background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.error.main})`,
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
