@@ -6,14 +6,12 @@ import {
   Link,
   Typography,
 } from '@mui/material';
-import { toast } from 'react-toastify';
 import { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useForm, useWatch } from 'react-hook-form';
-import { Link as RouterLink, useNavigate } from 'react-router';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { FaUserPlus, FaUserCheck } from 'react-icons/fa';
+import { Link as RouterLink, useNavigate } from 'react-router';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import { fluidType } from '../../../customTheme';
 import { useTitle } from '../../../hooks/useTitle';
@@ -62,13 +60,12 @@ export const RegisterForm = () => {
 
   const onSubmit = async (values) => {
     try {
-      const response = await registerUser(values).unwrap();
+      await registerUser(values).unwrap();
       setTimeout(() => {
         navigate('/');
-        toast.success(response?.message || 'Registration successful');
       }, 1000);
-    } catch (error) {
-      toast.error(error?.data?.message || 'Registration failed');
+    } catch {
+      /* empty */
     }
   };
 
