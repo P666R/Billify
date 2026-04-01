@@ -39,10 +39,8 @@ const lastNameSchema = z
 const passwordSchema = z
   .string()
   .min(8, 'Password must be at least 8 characters long')
-  .trim()
-  .refine((v) => passwordStrength(v), {
-    error: 'Password is too weak. Try a longer phrase or add more unique words',
-  });
+  .max(80, 'Password cannot be longer than 80 characters')
+  .trim();
 
 const phoneNumberSchema = z.string().refine((v) => validator.isMobilePhone(v), {
   error:
@@ -79,7 +77,10 @@ export const registerUserSchema = z
     username: usernameSchema,
     firstName: firstNameSchema,
     lastName: lastNameSchema,
-    password: passwordSchema,
+    password: passwordSchema.refine((v) => passwordStrength(v), {
+      error:
+        'Password is too weak. Try a longer phrase or add more unique words',
+    }),
     passwordConfirm: passwordSchema,
   })
   .refine((v) => v.password === v.passwordConfirm, {
@@ -130,7 +131,10 @@ export const passwordResetRequestSchema = z
 
 export const userPasswordResetSchema = z
   .strictObject({
-    password: passwordSchema,
+    password: passwordSchema.refine((v) => passwordStrength(v), {
+      error:
+        'Password is too weak. Try a longer phrase or add more unique words',
+    }),
     passwordConfirm: passwordSchema,
     userId: userIdSchema,
     emailToken: emailTokenSchema,
