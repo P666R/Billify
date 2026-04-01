@@ -67,7 +67,7 @@ export const RegisterPage = () => {
             variants={itemVariants}
             sx={{
               color: theme.palette.primary.main,
-              pr: '1rem',
+              pr: '.5rem',
             }}
           >
             <svg width="0" height="0">
@@ -142,7 +142,7 @@ export const RegisterPage = () => {
                   fontSize: fluidType(14, 16),
                 }}
               >
-                Sign In
+                Log In
               </Link>
             </Stack>
           </MotionBox>
