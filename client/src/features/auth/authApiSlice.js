@@ -62,6 +62,16 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success('Email verification token resent successfully');
+        } catch (err) {
+          toast.error(
+            err?.error?.data?.message || 'Failed to resend verification email'
+          );
+        }
+      },
     }),
 
     passwordResetRequest: build.mutation({
@@ -70,6 +80,16 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success('Password reset email sent successfully');
+        } catch (err) {
+          toast.error(
+            err?.error?.data?.message || 'Failed to send reset email'
+          );
+        }
+      },
     }),
 
     resetPassword: build.mutation({
@@ -78,6 +98,14 @@ export const authApiSlice = baseApiSlice.injectEndpoints({
         method: 'POST',
         body,
       }),
+      async onQueryStarted(_, { queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          toast.success('Password reset successfully');
+        } catch (err) {
+          toast.error(err?.error?.data?.message || 'Failed to reset password');
+        }
+      },
     }),
   }),
 });
