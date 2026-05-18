@@ -67,3 +67,23 @@ export const loginUserSchema = z
     password: passwordSchema,
   })
   .readonly();
+
+export const resendVerifyEmailSchema = z
+  .strictObject({
+    email: emailSchema,
+  })
+  .readonly();
+
+export const resetPasswordUserSchema = z
+  .strictObject({
+    password: passwordSchema.refine((v) => passwordStrength(v), {
+      error:
+        'Password is too weak. Try a longer phrase or add more unique words',
+    }),
+    passwordConfirm: z.string().min(1, 'Confirm password is required').trim(),
+  })
+  .refine((v) => v.password === v.passwordConfirm, {
+    error: 'Passwords do not match',
+    path: ['passwordConfirm'],
+  })
+  .readonly();
