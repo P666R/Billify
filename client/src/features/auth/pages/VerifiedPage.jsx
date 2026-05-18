@@ -12,8 +12,7 @@ import { FaCheckCircle, FaArrowRight, FaHome } from 'react-icons/fa';
 import { useTitle } from '../../../hooks/useTitle';
 import { fluidType } from '../../../customTheme';
 
-const MotionContainer = motion.create(Container);
-const MotionTypography = motion.create(Typography);
+const MotionDiv = motion.div;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -48,11 +47,8 @@ export const VerifiedPage = () => {
   const theme = useTheme();
 
   return (
-    <MotionContainer
+    <Container
       maxWidth="md"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
       sx={{
         display: 'flex',
         flexDirection: 'column',
@@ -61,93 +57,114 @@ export const VerifiedPage = () => {
         flexGrow: 1,
         textAlign: 'center',
         minHeight: '80dvh',
+        marginTop: '4rem',
       }}
     >
-      {/* Animated Success Icon */}
-      <motion.div variants={iconVariants} animate="animate">
-        <Box sx={{ color: theme.palette.success.main, mb: 4 }}>
-          <FaCheckCircle size={fluidType(60, 100)} />
-        </Box>
-      </motion.div>
-
-      {/* Success Messaging */}
-      <MotionTypography
-        variants={itemVariants}
-        variant="h1"
-        fontWeight={900}
-        sx={{
-          fontSize: fluidType(50, 90),
-          lineHeight: 1,
-          mb: 2,
-          background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.error.main})`,
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          letterSpacing: '-0.05em',
+      <MotionDiv
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
         }}
       >
-        Verified!
-      </MotionTypography>
+        {/* Animated Success Icon */}
+        <MotionDiv variants={iconVariants} animate="animate">
+          <Box sx={{ color: theme.palette.success.main, mb: 4 }}>
+            <FaCheckCircle size={fluidType(60, 100)} />
+          </Box>
+        </MotionDiv>
 
-      <MotionTypography
-        variants={itemVariants}
-        variant="h4"
-        fontWeight={700}
-        sx={{ fontSize: fluidType(24, 32), mb: 2 }}
-      >
-        You are all set to go
-      </MotionTypography>
+        {/* Success Messaging */}
+        <MotionDiv variants={itemVariants}>
+          <Typography
+            variant="h1"
+            fontWeight={900}
+            sx={{
+              fontSize: fluidType(50, 90),
+              lineHeight: 1,
+              mb: 2,
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.error.main})`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.05em',
+            }}
+          >
+            Verified!
+          </Typography>
+        </MotionDiv>
 
-      <MotionTypography
-        variants={itemVariants}
-        variant="body1"
-        color="text.secondary"
-        sx={{
-          maxWidth: '500px',
-          mb: 5,
-          mx: 'auto',
-          fontSize: fluidType(16, 18),
-          lineHeight: 1.6,
-        }}
-      >
-        Your account has been successfully verified.
-        <br /> A confirmation email has been sent to your inbox.
-        <br /> You can now access all features.
-      </MotionTypography>
+        <MotionDiv variants={itemVariants}>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            sx={{ fontSize: fluidType(24, 32), mb: 2 }}
+          >
+            You are all set to go
+          </Typography>
+        </MotionDiv>
 
-      {/* Action Buttons */}
-      <Stack
-        component={motion.div}
-        variants={itemVariants}
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={fluidType(20, 30)}
-        justifyContent="center"
-        sx={{ width: '100%', maxWidth: '450px' }}
-      >
-        <Button
-          variant="contained"
-          color="secondary"
-          fullWidth
-          size="large"
-          startIcon={<FaHome />}
-          component={Link}
-          to="/"
-          sx={{ borderRadius: '1rem', textTransform: 'none', py: 1.5 }}
+        <MotionDiv variants={itemVariants}>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{
+              maxWidth: '500px',
+              mb: 5,
+              mx: 'auto',
+              fontSize: fluidType(16, 18),
+              lineHeight: 1.6,
+            }}
+          >
+            Your account has been successfully verified.
+            <br /> A confirmation email has been sent to your inbox.
+            <br /> You can now access all features.
+          </Typography>
+        </MotionDiv>
+
+        {/* Action Buttons */}
+        <MotionDiv
+          variants={itemVariants}
+          style={{ width: '100%', maxWidth: '450px' }}
         >
-          Back to Home
-        </Button>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={fluidType(20, 30)}
+            justifyContent="center"
+            sx={{ width: '100%' }}
+          >
+            <Button
+              variant="contained"
+              component={Link}
+              to="/"
+              viewTransition
+              fullWidth
+              size="large"
+              startIcon={<FaHome />}
+              color="secondary"
+              sx={{ borderRadius: '1rem', textTransform: 'none', py: 1.5 }}
+            >
+              Back to Home
+            </Button>
 
-        <Button
-          variant="contained"
-          component={Link}
-          to="/login"
-          fullWidth
-          size="large"
-          startIcon={<FaArrowRight />}
-          sx={{ borderRadius: '1rem', textTransform: 'none', py: 1.5 }}
-        >
-          Login Now
-        </Button>
-      </Stack>
-    </MotionContainer>
+            <Button
+              variant="contained"
+              component={Link}
+              to="/login"
+              viewTransition
+              fullWidth
+              size="large"
+              startIcon={<FaArrowRight />}
+              sx={{ borderRadius: '1rem', textTransform: 'none', py: 1.5 }}
+            >
+              Login Now
+            </Button>
+          </Stack>
+        </MotionDiv>
+      </MotionDiv>
+    </Container>
   );
 };
