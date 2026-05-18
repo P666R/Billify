@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import { rateLimit } from 'express-rate-limit';
 
 const limitHandler = (req, res, _next, options) => {
   const isAuth = options.message.error.includes('login attempts');
