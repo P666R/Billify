@@ -39,6 +39,7 @@ export const newAccessToken = async (req, res) => {
         username: user.username,
         provider: user.provider,
         avatar: user.avatar,
+        roles: user.roles,
       },
       accessToken,
     });
