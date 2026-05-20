@@ -147,7 +147,8 @@ export const userPasswordResetSchema = z
 
 export const getAllAccountsQuerySchema = z
   .object({
-    pageNumber: z.coerce.number().positive().catch(1), // NOSONAR
+    pageSize: z.coerce.number().positive().catch(10),
+    pageNumber: z.coerce.number().positive().catch(1),
   })
   .readonly();
 

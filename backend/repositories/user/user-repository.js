@@ -25,15 +25,26 @@ export const findUserByIdAndUpdate = (id, data) =>
 export const findUserByIdAndDelete = (id) =>
   User.findByIdAndDelete(id).select('-refreshToken -roles -__v').lean();
 
-export const countAllUsers = () => User.countDocuments({});
+export const getPaginatedUsers = async (pageSize, pageNumber) => {
+  const [result] = await User.aggregate([
+    {
+      $facet: {
+        totalCount: [{ $count: 'count' }],
+        paginatedData: [
+          { $sort: { createdAt: -1 } },
+          { $skip: (pageNumber - 1) * pageSize },
+          { $limit: pageSize },
+          { $project: { refreshToken: 0, __v: 0 } },
+        ],
+      },
+    },
+  ]);
 
-export const findAllUsers = (pageSize, page) =>
-  User.find()
-    .sort({ createdAt: -1 })
-    .select('-refreshToken -__v')
-    .limit(pageSize)
-    .skip((page - 1) * pageSize)
-    .lean();
+  const count = result?.totalCount?.[0]?.count || 0;
+  const users = result?.paginatedData || [];
+
+  return { count, users };
+};
 
 export const findUserByRefreshToken = (data) => User.findOne(data);
 

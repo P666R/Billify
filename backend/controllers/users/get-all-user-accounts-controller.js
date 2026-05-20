@@ -3,11 +3,10 @@ import * as getAllUserAccountsService from '#services/users/get-all-user-account
 // GET /api/v1/user/all
 
 export const getAllUserAccounts = async (req, res) => {
-  const pageSize = 10;
-  const { pageNumber: page } = req.query;
+  const { pageSize, pageNumber } = req.valid.query;
 
   const { count, users, numberOfPages } =
-    await getAllUserAccountsService.getAllUserAccounts(pageSize, page);
+    await getAllUserAccountsService.getAllUserAccounts(pageSize, pageNumber);
 
   req.log.info('User accounts fetched successfully');
 
