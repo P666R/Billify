@@ -24,6 +24,7 @@ await connectionToDB();
 
 // Initialize express app
 const app = express();
+app.disable('x-powered-by');
 
 const server = http.createServer(app);
 
