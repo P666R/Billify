@@ -5,7 +5,7 @@ import * as deactivateUserService from '#services/users/deactivate-user-service.
 
 export const deactivateUser = async (req, res) => {
   const { _id: adminId } = req.user;
-  const { id: userId } = req.params;
+  const { id: userId } = req.valid.params;
 
   const { _id, ...updatedUser } = await deactivateUserService.deactivateUser(
     adminId,

@@ -5,7 +5,7 @@ import * as deleteUserAccountService from '#services/users/delete-user-account-s
 
 export const deleteUserAccount = async (req, res) => {
   const { _id: adminId } = req.user;
-  const { id: userId } = req.params;
+  const { id: userId } = req.valid.params;
 
   const { _id, firstName } = await deleteUserAccountService.deleteUserAccount(
     adminId,

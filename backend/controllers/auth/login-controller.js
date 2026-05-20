@@ -4,8 +4,8 @@ import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 // POST /api/v1/auth/login
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-  const { jwt: currentCookieToken } = req.cookies;
+  const { email, password } = req.valid.body;
+  const { jwt: currentCookieToken } = req.valid.cookies;
 
   // Setup cookie options
   const cookieOptions = {

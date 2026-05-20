@@ -4,7 +4,7 @@ import * as passwordResetService from '#services/auth/password-reset-service.js'
 // POST /api/v1/auth/reset_password_request
 
 export const passwordResetRequest = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.valid.body;
 
   const user = await passwordResetService.passwordResetRequest(email);
 
@@ -20,7 +20,7 @@ export const passwordResetRequest = async (req, res) => {
 // POST /api/v1/auth/reset_password
 
 export const userPasswordReset = async (req, res) => {
-  const { password, passwordConfirm, userId, emailToken } = req.body;
+  const { password, passwordConfirm, userId, emailToken } = req.valid.body;
 
   const user = await passwordResetService.userPasswordReset({
     password,

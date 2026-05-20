@@ -7,7 +7,7 @@ export const updateUserProfile = async (req, res) => {
   const { _id: userId } = req.user;
 
   const { _id, ...updatedUser } =
-    await updateUserProfileService.updateUserProfile(userId, req.body);
+    await updateUserProfileService.updateUserProfile(userId, req.valid.body);
 
   enrichRequestLogger(req, { userId: _id });
   req.log.info('User profile updated successfully');

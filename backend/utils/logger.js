@@ -191,8 +191,8 @@ if (isProd) {
       'res.headers["set-cookie"]',
 
       // Request body fields
-      'req.body.password',
-      'req.body.token',
+      'req.valid.body.password',
+      'req.valid.body.token',
     ],
     censor: '[REDACTED]',
   };

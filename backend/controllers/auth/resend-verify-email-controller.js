@@ -4,7 +4,7 @@ import * as resendVerifyEmailService from '#services/auth/resend-verify-email-se
 // POST /api/v1/auth/resend_email_token
 
 export const resendVerifyEmail = async (req, res) => {
-  const { email } = req.body;
+  const { email } = req.valid.body;
 
   const user = await resendVerifyEmailService.resendVerifyEmail(email);
 

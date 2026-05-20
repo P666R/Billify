@@ -4,7 +4,7 @@ import * as verifyEmailService from '#services/auth/verify-email-service.js';
 //  GET /api/v1/auth/verify/:emailToken/:userId
 
 export const verifyEmail = async (req, res) => {
-  const { emailToken, userId } = req.params;
+  const { emailToken, userId } = req.valid.params;
 
   const user = await verifyEmailService.verifyEmail(emailToken, userId);
 

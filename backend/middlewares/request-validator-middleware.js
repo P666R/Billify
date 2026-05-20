@@ -2,11 +2,13 @@ export const validateRequest = (schemas) => (req, _res, next) => {
   try {
     const targets = ['body', 'params', 'query', 'cookies'];
 
+    // Initialize container to prevent overwriting across multiple validation middlewares
+    // Required since req.query in express 5 is read-only
+    req.valid = req.valid || {};
+
     for (const target of targets) {
       if (schemas[target] && req[target]) {
-        const validatedData = schemas[target].parse(req[target]);
-        // Modify the object content instead of reassigning the property
-        Object.assign(req[target], validatedData);
+        req.valid[target] = schemas[target].parse(req[target]);
       }
     }
     next();

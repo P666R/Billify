@@ -5,7 +5,7 @@ import * as refreshTokenService from '#services/auth/refresh-token-service.js';
 // Get new access token from the refresh token
 
 export const newAccessToken = async (req, res) => {
-  const { jwt: refreshToken } = req.cookies;
+  const { jwt: refreshToken } = req.valid.cookies;
 
   const cookieOptions = {
     httpOnly: true,

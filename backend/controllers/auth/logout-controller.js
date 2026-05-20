@@ -4,7 +4,7 @@ import { enrichRequestLogger } from '#middlewares/logging-middleware.js';
 // POST /api/v1/auth/logout
 
 export const logoutUser = async (req, res) => {
-  const { jwt: currentCookieToken } = req.cookies;
+  const { jwt: currentCookieToken } = req.valid.cookies;
 
   // Setup cookie options
   const cookieOptions = {
